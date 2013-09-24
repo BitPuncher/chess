@@ -7,9 +7,9 @@ class Pawn < Piece
     super(position, color)
     @moved_yet = false
     if @color == :white
-      @facing = 1
-    else
       @facing = -1
+    else
+      @facing = 1
     end
   end
 

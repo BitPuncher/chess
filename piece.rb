@@ -1,5 +1,5 @@
 class Piece
-  :position, :color
+  attr_accessor :position, :color
 
   def initialize(position, color)
     @position = position
@@ -12,6 +12,10 @@ class Piece
     end
   end
 
+
+  def on_board?(move)
+    (1..7).include?(move[0]) && (1..7).include?(move[1])
+  end
 end
 
 
