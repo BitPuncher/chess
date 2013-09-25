@@ -1,7 +1,7 @@
 require './piece'
 
 class Pawn < Piece
-  # attr_accessor :moved
+  attr_accessor :moved
   attr_reader :moved_yet, :facing
 
   def initialize(color)
@@ -12,6 +12,12 @@ class Pawn < Piece
     else
       @facing = 1
     end
+  end
+
+  def duplicate
+    pawn = self.class.new(@color)
+    pawn.moved = @moved
+    pawn
   end
 
   def move_dir
@@ -25,10 +31,6 @@ class Pawn < Piece
       vectors << [1, 1]
     end
     vectors
-  end
-
-  def moved
-    @moved_yet = true
   end
 
 end

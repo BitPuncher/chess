@@ -16,6 +16,9 @@ class Piece
     moves.select { |move| on_board?(move) }
   end
 
+  def duplicate
+    self.class.new(@color)
+  end
 
   def on_board?(move)
     (0..7).include?(move[0]) && (0..7).include?(move[1])

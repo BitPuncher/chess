@@ -37,7 +37,7 @@ class Board
     @grid[end_pos[0]][end_pos[1]] = moving_piece
     @grid[start_pos[0]][start_pos[1]] = nil
 
-    moving_piece.moved if moving_piece.is_a?(Pawn)
+    moving_piece.moved = true if moving_piece.is_a?(Pawn)
     true
   end
 
@@ -111,6 +111,17 @@ class Board
     valid_moves
   end
 
+  def duplicate
+    board = Board.new
+    (0..7).each do |row|
+      (0..7).each do |col|
+        piece = piece_at([row, col])
+
+        board.grid[row][col] = (piece ? piece_at([row, col]).duplicate : nil)
+      end
+    end
+    board
+  end
 
   def find_king(color)
     (0..7).each do |row|
