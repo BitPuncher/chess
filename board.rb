@@ -15,6 +15,8 @@ class Board
     @grid = Array.new(8) { Array.new(8) }
   end
 
+  # def [](pos)
+  # def []=(pos, val)
   def piece_at(position)
     row = position[0]
     col = position[1]
@@ -28,7 +30,7 @@ class Board
   # end
 
   def move(start_pos, end_pos)
-    return unless valid_move?(start_pos, end_pos)
+    return false unless valid_move?(start_pos, end_pos)
 
     moving_piece = piece_at(start_pos)
 
@@ -36,9 +38,11 @@ class Board
     @grid[start_pos[0]][start_pos[1]] = nil
 
     moving_piece.moved if moving_piece.is_a?(Pawn)
+    true
   end
 
   def valid_move?(start_pos, end_pos)
+    # @errors
     piece = piece_at(start_pos)
     raise "There is no piece there." unless piece
 
@@ -86,38 +90,32 @@ class Board
 
   def points_between(start_pos, end_pos)
 
-    # prob can be refactored
-    # just find range from 0 to change.abs and then map by change/change.abs
-
     x_change = end_pos[0] - start_pos[0]
     y_change = end_pos[1] - start_pos[1]
 
-    y_range = (-(y_change.abs)..y_change.abs).to_a
-    if y_change < 0
-      y_range.select! { |y| y < 0 }.reverse!
-    else
-      y_range.select! { |y| y > 0 }
-    end
+    x_range = zero_to_delta(x_change)
+    y_range = zero_to_delta(y_change)
 
-    x_range = (-(x_change.abs)..x_change.abs).to_a
-    if x_change < 0
-      x_range.select! { |x| x < 0 }.reverse!
-    else
-      x_range.select! { |x| x > 0 }
-    end
+    deltas = build_deltas_from(x_range, y_range)
 
-
-    distances = []
-    [x_range.length, y_range.length].max.times do |index|
-      x_val = x_range[index] || 0
-      y_val = y_range[index] || 0
-
-      distances << [x_val, y_val]
-    end
-
-    distances[0..-2].map do |distance|
+    deltas.map do |distance|
       [distance[0] + start_pos[0], distance[1] + start_pos[1]]
     end
+  end
+
+  def zero_to_delta(change)
+    (1...change.abs).to_a.map { |element| element * (change/change.abs) }
+  end
+
+  def build_deltas_from(domain, range)
+    positions = []
+    [domain.length, range.length].max.times do |index|
+      x_val = domain[index] || 0
+      y_val = range[index] || 0
+
+      positions << [x_val, y_val]
+    end
+    positions
   end
 
   def place_board
@@ -141,7 +139,9 @@ class Board
     end
   end
 
+  # def to_s
   def show_board
+    # board_str = ""
     print "   "
     (1..8).each do |col_num|
       print "|#{col_num}".rjust(4)

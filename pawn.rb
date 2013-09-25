@@ -1,6 +1,7 @@
 require './piece'
 
 class Pawn < Piece
+  # attr_accessor :moved
   attr_reader :moved_yet, :facing
 
   def initialize(color)

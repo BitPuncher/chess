@@ -20,12 +20,14 @@ class Piece
   end
 
   def display
-    code = DISPLAY_CODES[:knight] if is_a?(Knight)
-    code = DISPLAY_CODES[:rook] if is_a?(Rook)
-    code = DISPLAY_CODES[:queen] if is_a?(Queen)
-    code = DISPLAY_CODES[:king] if is_a?(King)
-    code = DISPLAY_CODES[:bishop] if is_a?(Bishop)
-    code = DISPLAY_CODES[:pawn] if is_a?(Pawn)
+    code = DISPLAY_CODES[self.class.to_s.downcase.to_sym]
+    #
+    # code = DISPLAY_CODES[:knight] if is_a?(Knight)
+    # code = DISPLAY_CODES[:rook] if is_a?(Rook)
+    # code = DISPLAY_CODES[:queen] if is_a?(Queen)
+    # code = DISPLAY_CODES[:king] if is_a?(King)
+    # code = DISPLAY_CODES[:bishop] if is_a?(Bishop)
+    # code = DISPLAY_CODES[:pawn] if is_a?(Pawn)
 
     # color == "white" ? [code].pack('U').white : [code].pack('U').blue
     if color == :white
