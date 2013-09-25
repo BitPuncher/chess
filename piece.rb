@@ -1,15 +1,14 @@
 class Piece
-  attr_accessor :position, :color
+  attr_accessor :color
 
   DISPLAY_CODES = {:pawn => 9823, :rook => 9820, :knight => 9822,
                   :bishop => 9821, :king => 9818, :queen => 9819}
 
-  def initialize(position, color)
-    @position = position
+  def initialize(color)
     @color = color
   end
 
-  def moves
+  def moves(position)
     move_dir.map do |vector|
       [position[0] + vector[0], position[1] + vector[1]]
     end
@@ -17,7 +16,7 @@ class Piece
 
 
   def on_board?(move)
-    (1..7).include?(move[0]) && (1..7).include?(move[1])
+    (0..7).include?(move[0]) && (0..7).include?(move[1])
   end
 
   def display

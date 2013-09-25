@@ -3,8 +3,8 @@ require './piece'
 class Pawn < Piece
   attr_reader :moved_yet, :facing
 
-  def initialize(position, color)
-    super(position, color)
+  def initialize(color)
+    super(color)
     @moved_yet = false
     if @color == :white
       @facing = -1
@@ -14,9 +14,13 @@ class Pawn < Piece
   end
 
   def move_dir
-    vectors = [[0, 1 * @facing]]
-    vectors << [0, 2 * @facing] if @moved_yet == false
+    vectors = [[1 * @facing, 0]]
+    vectors << [2 * @facing, 0] if @moved_yet == false
     vectors
+  end
+
+  def moved
+    @moved_yet = true
   end
 
 end

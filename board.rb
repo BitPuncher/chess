@@ -15,34 +15,52 @@ class Board
     @grid = Array.new(8) { Array.new(8) }
   end
 
+  def piece_at(position)
+    row = position[0]
+    col = position[1]
+    @grid[row][col]
+  end
+
+  # def piece_at=(position, piece)
+  #   row = position[0]
+  #   col = position[1]
+  #   @grid[row][col] = piece
+  # end
+
   def move(start_pos, end_pos)
     return unless valid_move?(start_pos, end_pos)
 
-    @grid[end_pos[0]][end_pos[1]] = @grid[start_pos[0]][start_pos[1]]
+    moving_piece = piece_at(start_pos)
+
+    @grid[end_pos[0]][end_pos[1]] = moving_piece
     @grid[start_pos[0]][start_pos[1]] = nil
+
+    moving_piece.moved if moving_piece.is_a?(Pawn)
   end
 
   def valid_move?(start_pos, end_pos)
-    piece = @grid[start_pos[0]][start_pos[1]]
+    piece = piece_at(start_pos)
     return false unless piece
 
-    unless piece.moves.include?(end_pos)
+    unless piece.moves(start_pos).include?(end_pos)
       raise "That's not within the piece's move range!"
     end
 
-    if blocked?(piece, end_pos)
+    if blocked?(start_pos, end_pos)
       puts "That move is blocked, try again!"
     end
 
     true
   end
 
-  def blocked?(piece, end_pos)
+  def blocked?(start_pos, end_pos)
+    piece = piece_at(start_pos)
+
     return true if destination_is_friendly?(piece, end_pos)
 
     if piece.is_a?(Pawn)
       # future helper method to check if pawn attack ranges are valid
-      @grid[end_pos[0]][end_pos[1]]
+      @grid[end_pos[0]][end_pos[1]] # this might allow a pawn on its first move to hop
     elsif piece.is_a?(SlidingPiece)
       are_pieces_between?(piece, end_pos)
     else
@@ -50,16 +68,19 @@ class Board
     end
   end
 
-  def destination_is_friendly?(piece, end_pos)
-    destination = @grid[end_pos[0]][end_pos[1]]
-    destination && destination.color == piece.color
+  def destination_is_friendly?(moving_piece, end_pos)
+    occupant = piece_at(end_pos)
+    occupant && occupant.color == moving_piece.color
   end
 
-  def are_pieces_between?(piece, end_pos)
-    points_between(piece.position, end_pos).any? { |position| !position.nil? }
+  def are_pieces_between?(start_pos, end_pos)
+    points_between(start_pos, end_pos).any? { |position| position }
   end
 
   def points_between(start_pos, end_pos)
+
+    # prob can be refactored
+    # just find range from 0 to change.abs and then map by change/change.abs
 
     x_change = end_pos[0] - start_pos[0]
     y_change = end_pos[1] - start_pos[1]
@@ -93,23 +114,23 @@ class Board
   end
 
   def place_board
-    @grid[0] = back_row(0, "black")
-    @grid[1] = pawn_row(1, "black")
-    @grid[6] = pawn_row(6, "white")
-    @grid[7] = back_row(7, "white")
+    @grid[0] = back_row("black")
+    @grid[1] = pawn_row("black")
+    @grid[6] = pawn_row("white")
+    @grid[7] = back_row("white")
 
     puts "Board Placed!".red
   end
 
-  def back_row(row, color)
+  def back_row(color)
     (1..8).map do |x_value|
-      eval(BACK_PIECES[x_value]).new([x_value - 1, row], color)
+      eval(BACK_PIECES[x_value]).new(color)
     end
   end
 
-  def pawn_row(row, color)
+  def pawn_row(color)
     (1..8).map do |x_value|
-      Pawn.new([x_value - 1, row], color)
+      Pawn.new(color)
     end
   end
 
