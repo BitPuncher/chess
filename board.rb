@@ -26,26 +26,38 @@ class Board
       raise "That's not within the piece's move range!"
     end
 
+    if blocked?(piece, end_pos)
+      raise "That move is blocked, try again!"
+    end
 
+    true
   end
 
-  # def blocked?(piece, end_pos)
-  #   if piece.is_a?(Pawn)
-  #     @grid[end_pos[0][end_pos[1]]
-  #   elsif piece.is_a?(SlidingPiece)
-  #     return true if @grid[end_pos[0]][end_pos[1]].color == piece.color
-  #     x_change = end_pos[0] - piece.position[0]
-  #     y_change = end_pos[1] - piece.position[1]
-  #
-  #     x_values =
-  #   end
-  # end
+  def blocked?(piece, end_pos)
+    return true if destination_is_friendly?(piece, end_pos)
+
+    if piece.is_a?(Pawn)
+      # future helper method to check if pawn attack ranges are valid
+      @grid[end_pos[0][end_pos[1]]
+    elsif piece.is_a?(SlidingPiece)
+      are_pieces_between?(piece, end_pos)
+    else
+      false
+    end
+  end
+
+  def destination_is_friendly?(piece, end_pos)
+    @grid[end_pos[0]][end_pos[1]].color == piece.color
+  end
+
+  def are_pieces_between?(piece, end_pos)
+    points_between(piece.position, end_pos).any? { |position| !position.nil? }
+  end
 
   def points_between(start_pos, end_pos)
 
-    x_change = end_pos[0] - start_pos[0] - 1
-    y_change = end_pos[1] - start_pos[1] - 1
-
+    x_change = end_pos[0] - start_pos[0]
+    y_change = end_pos[1] - start_pos[1]
 
     y_range = (-(y_change.abs)..y_change.abs).to_a
     if y_change < 0
@@ -62,15 +74,17 @@ class Board
     end
 
 
-    points_between = []
+    distances = []
     [x_range.length, y_range.length].max.times do |index|
       x_val = x_range[index] || 0
       y_val = y_range[index] || 0
 
-      points_between << [x_val, y_val]
+      distances << [x_val, y_val]
     end
 
-    points_between
+    distances[0..-2].map do |distance|
+      [distance[0] + start_pos[0], distance[1] + start_pos[1]]
+    end
   end
 
   def place_board
