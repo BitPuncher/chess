@@ -9,9 +9,11 @@ class Piece
   end
 
   def moves(position)
-    move_dir.map do |vector|
+    moves = move_dir.map do |vector|
       [position[0] + vector[0], position[1] + vector[1]]
     end
+
+    moves.select { |move| on_board?(move) }
   end
 
 

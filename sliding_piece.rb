@@ -1,7 +1,7 @@
 require './piece.rb'
 
 class SlidingPiece < Piece
-  def moves
+  def moves(position)
     moves = []
     move_dir.each do |vector|
       (1..7).each do |multiplier|

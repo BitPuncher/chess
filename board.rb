@@ -44,16 +44,21 @@ class Board
   def valid_move?(start_pos, end_pos)
     # @errors
     piece = piece_at(start_pos)
-    raise "There is no piece there." unless piece
+    # raise "There is no piece there."
+    return false unless piece
 
-    raise "That's not within the piece's move range!" unless piece.moves(start_pos).include?(end_pos)
+    # raise "That's not within the piece's move range!"
+    return false unless piece.moves(start_pos).include?(end_pos)
 
     if pawn_attack?(start_pos, end_pos)
-      raise "A Pawn can't attack an empty space." unless piece_at(end_pos)
-      raise "A Pawn can only attack an enemy piece." if destination_is_friendly?(start_pos, end_pos)
+      # raise "A Pawn can't attack an empty space."
+      return false unless piece_at(end_pos)
+      # raise "A Pawn can only attack an enemy piece."
+      return false if destination_is_friendly?(start_pos, end_pos)
     end
 
-    raise "That move is blocked, try again!" if blocked?(start_pos, end_pos)
+    # raise "That move is blocked, try again!"
+    return false if blocked?(start_pos, end_pos)
 
     true
   end
@@ -73,10 +78,50 @@ class Board
       # future helper method to check if pawn attack ranges are valid
       @grid[end_pos[0]][end_pos[1]] # this might allow a pawn on its first move to hop
     elsif piece.is_a?(SlidingPiece)
-      are_pieces_between?(piece, end_pos)
+      are_pieces_between?(start_pos, end_pos)
     else
       false
     end
+  end
+
+  def in_check?(color)
+    king_position = find_king(color)
+
+    (0..7).each do |row|
+      (0..7).each do |col|
+        return true if piece_at([row, col]).color != color && valid_move?([row, col], king_position)
+      end
+    end
+    false
+  end
+
+  def all_valid_moves_of(color)
+    valid_moves = []
+
+    (0..7).each do |row|
+      (0..7).each do |col|
+        piece = piece_at([row, col])
+        if piece && piece.color == color
+          new_valid_moves = piece.moves([row, col]).select { |move| valid_move?([row, col], move)}
+          valid_moves = valid_moves + new_valid_moves
+        end
+      end
+    end
+
+    valid_moves
+  end
+
+
+  def find_king(color)
+    (0..7).each do |row|
+      (0..7).each do |col|
+        piece = piece_at([row, col])
+        if piece && piece.is_a?(King) && piece.color == color
+          return [row, col]
+        end
+      end
+    end
+    false
   end
 
   def destination_is_friendly?(start_pos, end_pos)
