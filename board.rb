@@ -38,7 +38,7 @@ class Board
 
     if piece.is_a?(Pawn)
       # future helper method to check if pawn attack ranges are valid
-      @grid[end_pos[0][end_pos[1]]
+      @grid[end_pos[0]][end_pos[1]]
     elsif piece.is_a?(SlidingPiece)
       are_pieces_between?(piece, end_pos)
     else
