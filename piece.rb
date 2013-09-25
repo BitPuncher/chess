@@ -28,7 +28,7 @@ class Piece
     code = DISPLAY_CODES[:pawn] if is_a?(Pawn)
 
     # color == "white" ? [code].pack('U').white : [code].pack('U').blue
-    if color == "white"
+    if color == :white
       [code].pack('U').white
     else
       [code].pack('U').blue

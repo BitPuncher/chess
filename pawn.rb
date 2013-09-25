@@ -16,6 +16,13 @@ class Pawn < Piece
   def move_dir
     vectors = [[1 * @facing, 0]]
     vectors << [2 * @facing, 0] if @moved_yet == false
+    if @color == :white
+      vectors << [-1, -1]
+      vectors << [-1, 1]
+    else
+      vectors << [1, -1]
+      vectors << [1, 1]
+    end
     vectors
   end
 

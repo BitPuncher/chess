@@ -40,23 +40,30 @@ class Board
 
   def valid_move?(start_pos, end_pos)
     piece = piece_at(start_pos)
-    return false unless piece
+    raise "There is no piece there." unless piece
 
-    unless piece.moves(start_pos).include?(end_pos)
-      raise "That's not within the piece's move range!"
+    raise "That's not within the piece's move range!" unless piece.moves(start_pos).include?(end_pos)
+
+    if pawn_attack?(start_pos, end_pos)
+      raise "A Pawn can't attack an empty space." unless piece_at(end_pos)
+      raise "A Pawn can only attack an enemy piece." if destination_is_friendly?(start_pos, end_pos)
     end
 
-    if blocked?(start_pos, end_pos)
-      puts "That move is blocked, try again!"
-    end
+    raise "That move is blocked, try again!" if blocked?(start_pos, end_pos)
 
     true
   end
 
-  def blocked?(start_pos, end_pos)
-    piece = piece_at(start_pos)
+  def pawn_attack?(start_pos, end_pos)
+    return false unless piece_at(start_pos).is_a?(Pawn)
+    return false if start_pos[1] == end_pos[1]
+    true
+  end
 
-    return true if destination_is_friendly?(piece, end_pos)
+  def blocked?(start_pos, end_pos)
+    return true if destination_is_friendly?(start_pos, end_pos)
+
+    piece = piece_at(start_pos)
 
     if piece.is_a?(Pawn)
       # future helper method to check if pawn attack ranges are valid
@@ -68,9 +75,9 @@ class Board
     end
   end
 
-  def destination_is_friendly?(moving_piece, end_pos)
+  def destination_is_friendly?(start_pos, end_pos)
     occupant = piece_at(end_pos)
-    occupant && occupant.color == moving_piece.color
+    occupant && occupant.color == piece_at(start_pos).color
   end
 
   def are_pieces_between?(start_pos, end_pos)
@@ -114,10 +121,10 @@ class Board
   end
 
   def place_board
-    @grid[0] = back_row("black")
-    @grid[1] = pawn_row("black")
-    @grid[6] = pawn_row("white")
-    @grid[7] = back_row("white")
+    @grid[0] = back_row(:black)
+    @grid[1] = pawn_row(:black)
+    @grid[6] = pawn_row(:white)
+    @grid[7] = back_row(:white)
 
     puts "Board Placed!".red
   end
