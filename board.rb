@@ -16,18 +16,22 @@ class Board
   end
 
   def move(start_pos, end_pos)
+    return unless valid_move?(start_pos, end_pos)
+
     @grid[end_pos[0]][end_pos[1]] = @grid[start_pos[0]][start_pos[1]]
     @grid[start_pos[0]][start_pos[1]] = nil
   end
 
   def valid_move?(start_pos, end_pos)
     piece = @grid[start_pos[0]][start_pos[1]]
-    unless piece.moves.include? (start_pos)
+    return false unless piece
+
+    unless piece.moves.include?(end_pos)
       raise "That's not within the piece's move range!"
     end
 
     if blocked?(piece, end_pos)
-      raise "That move is blocked, try again!"
+      puts "That move is blocked, try again!"
     end
 
     true
@@ -47,7 +51,8 @@ class Board
   end
 
   def destination_is_friendly?(piece, end_pos)
-    @grid[end_pos[0]][end_pos[1]].color == piece.color
+    destination = @grid[end_pos[0]][end_pos[1]]
+    destination && destination.color == piece.color
   end
 
   def are_pieces_between?(piece, end_pos)
