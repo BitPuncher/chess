@@ -60,6 +60,12 @@ class Board
     # raise "That move is blocked, try again!"
     return false if blocked?(start_pos, end_pos)
 
+    duped_board = self.duplicate
+    #duped_board.move(start_pos, end_pos)
+    duped_board.grid[end_pos[0]][end_pos[1]] = duped_board.piece_at(start_pos)
+    duped_board.grid[start_pos[0]][start_pos[1]] = nil
+    return false if duped_board.in_check?(piece.color)
+
     true
   end
 
@@ -89,10 +95,21 @@ class Board
 
     (0..7).each do |row|
       (0..7).each do |col|
-        return true if piece_at([row, col]).color != color && valid_move?([row, col], king_position)
+        piece = piece_at([row, col])
+        if piece
+          return true if piece.color != color && valid_move?([row, col], king_position)
+        end
       end
     end
     false
+  end
+
+  def in_checkmate?(color)
+    all_valid_moves_of(color).empty? && in_check?(color)
+  end
+
+  def stalemate?(color)
+    #NYI
   end
 
   def all_valid_moves_of(color)
@@ -102,12 +119,12 @@ class Board
       (0..7).each do |col|
         piece = piece_at([row, col])
         if piece && piece.color == color
-          new_valid_moves = piece.moves([row, col]).select { |move| valid_move?([row, col], move)}
+          new_moves = piece.moves([row, col]).map { |destination| [[row, col], destination] }
+          new_valid_moves = new_moves.select { |new_move| valid_move?(new_move[0], new_move[1]) }
           valid_moves = valid_moves + new_valid_moves
         end
       end
     end
-
     valid_moves
   end
 
@@ -116,7 +133,6 @@ class Board
     (0..7).each do |row|
       (0..7).each do |col|
         piece = piece_at([row, col])
-
         board.grid[row][col] = (piece ? piece_at([row, col]).duplicate : nil)
       end
     end
@@ -141,7 +157,7 @@ class Board
   end
 
   def are_pieces_between?(start_pos, end_pos)
-    points_between(start_pos, end_pos).any? { |position| position }
+    points_between(start_pos, end_pos).any? { |position| piece_at(position) }
   end
 
   def points_between(start_pos, end_pos)
@@ -174,7 +190,7 @@ class Board
     positions
   end
 
-  def place_board
+  def place_pieces
     @grid[0] = back_row(:black)
     @grid[1] = pawn_row(:black)
     @grid[6] = pawn_row(:white)
