@@ -108,8 +108,8 @@ class Board
     all_valid_moves_of(color).empty? && in_check?(color)
   end
 
-  def stalemate?(color)
-    #NYI
+  def in_stalemate?(color)
+    all_valid_moves_of(color).empty? && !in_check?(color)
   end
 
   def all_valid_moves_of(color)
@@ -211,22 +211,22 @@ class Board
     end
   end
 
-  # def to_s
-  def show_board
-    # board_str = ""
-    print "   "
+  def to_s
+    board_str = ""
+    board_str << " "
     (1..8).each do |col_num|
-      print "|#{col_num}".rjust(4)
+      board_str << "| #{col_num} "
     end
-    print "\n"
+    board_str << "|\n"
 
     @grid.each_with_index do |row, index|
-      print "#{(index + 1)}|"
+      board_str << "#{(index + 1)}|"
       row.each do |piece|
-        print (piece ? "| #{piece.display} " : "|   ").ljust(3)
+        board_str << (piece ? " #{piece.display} |" : "   |").ljust(3)
       end
-      print "\n"
+      board_str << "\n"
 
     end
+    board_str
   end
 end
